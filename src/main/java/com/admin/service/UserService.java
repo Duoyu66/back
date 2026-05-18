@@ -29,10 +29,18 @@ public class UserService extends ServiceImpl<SysUserMapper, SysUser> {
     private final SysUserRoleMapper userRoleMapper;
     private final SysRoleMapper roleMapper;
     private final SysDeptMapper deptMapper;
+    private final DeptService deptService;
     private final PasswordEncoder passwordEncoder;
 
-    public PageResult<SysUser> page(int current, int size, String keyword) {
+    public PageResult<SysUser> page(int current, int size, String keyword, Long deptId) {
         LambdaQueryWrapper<SysUser> wrapper = new LambdaQueryWrapper<>();
+        if (deptId != null) {
+            List<Long> deptIds = deptService.listSelfAndDescendantIds(deptId);
+            if (deptIds.isEmpty()) {
+                return new PageResult<>(List.of(), 0, current, size);
+            }
+            wrapper.in(SysUser::getDeptId, deptIds);
+        }
         if (StringUtils.hasText(keyword)) {
             wrapper.and(w -> w.like(SysUser::getUsername, keyword)
                     .or().like(SysUser::getNickname, keyword)

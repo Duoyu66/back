@@ -50,12 +50,16 @@ public class MonitorService {
         return onlineUserRegistry.list(username, ip);
     }
 
+    private static final String FORCE_LOGOUT_WS =
+            "{\"type\":\"FORCE_LOGOUT\",\"msg\":\"您的账号已被管理员强制下线，请重新登录\"}";
+
     public void forceLogout(String sessionId) {
         if (sessionId == null || sessionId.isBlank()) {
             throw new BusinessException("会话不存在");
         }
         onlineUserRegistry.remove(sessionId);
         sessionTokenBlacklist.block(sessionId);
+        webSocketSessionManager.kickBySessionId(sessionId, FORCE_LOGOUT_WS);
     }
 
     public ServerMonitorVO getServerInfo() {

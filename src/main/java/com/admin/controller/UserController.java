@@ -25,8 +25,9 @@ public class UserController {
     public R<PageResult<SysUser>> page(
             @RequestParam(defaultValue = "1") int current,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) String keyword) {
-        return R.ok(userService.page(current, size, keyword));
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) Long deptId) {
+        return R.ok(userService.page(current, size, keyword, deptId));
     }
 
     @GetMapping("/{id}")

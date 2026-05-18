@@ -1,5 +1,6 @@
 package com.admin.websocket;
 
+import com.admin.monitor.SessionTokenBlacklist;
 import com.admin.security.JwtUtils;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
@@ -19,8 +20,10 @@ import java.util.Map;
 public class JwtHandshakeInterceptor implements HandshakeInterceptor {
 
     public static final String ATTR_USER_ID = "userId";
+    public static final String ATTR_SESSION_ID = "sessionId";
 
     private final JwtUtils jwtUtils;
+    private final SessionTokenBlacklist sessionTokenBlacklist;
 
     @Override
     public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response,
@@ -30,11 +33,16 @@ public class JwtHandshakeInterceptor implements HandshakeInterceptor {
             return false;
         }
         Claims claims = jwtUtils.parse(token);
+        String sessionId = jwtUtils.getSessionId(claims);
+        if (sessionTokenBlacklist.isBlocked(sessionId)) {
+            return false;
+        }
         Number userId = claims.get("userId", Number.class);
         if (userId == null) {
             return false;
         }
         attributes.put(ATTR_USER_ID, userId.longValue());
+        attributes.put(ATTR_SESSION_ID, sessionId);
         return true;
     }
 

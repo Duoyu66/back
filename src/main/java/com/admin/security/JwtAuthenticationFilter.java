@@ -1,7 +1,9 @@
 package com.admin.security;
 
+import com.admin.common.R;
 import com.admin.monitor.OnlineUserRegistry;
 import com.admin.monitor.SessionTokenBlacklist;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -26,6 +28,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final UserDetailsServiceImpl userDetailsService;
     private final OnlineUserRegistry onlineUserRegistry;
     private final SessionTokenBlacklist sessionTokenBlacklist;
+    private final ObjectMapper objectMapper;
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
@@ -41,7 +44,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             Claims claims = jwtUtils.parse(token);
             String sessionId = jwtUtils.getSessionId(claims);
             if (sessionTokenBlacklist.isBlocked(sessionId)) {
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                writeUnauthorized(response);
                 return;
             }
             String username = claims.getSubject();
@@ -55,6 +58,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             SecurityContextHolder.getContext().setAuthentication(auth);
         }
         chain.doFilter(request, response);
+    }
+
+    private void writeUnauthorized(HttpServletResponse response) throws IOException {
+        response.setStatus(HttpServletResponse.SC_OK);
+        response.setCharacterEncoding("UTF-8");
+        response.setContentType("application/json;charset=UTF-8");
+        response.getWriter().write(objectMapper.writeValueAsString(R.fail(401, "登录已失效，请重新登录")));
     }
 
     private String resolveToken(HttpServletRequest request) {

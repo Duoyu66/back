@@ -32,6 +32,27 @@ public class DeptService {
         return dept;
     }
 
+    /** 部门自身及所有下级部门 id（用于按组织筛选用户） */
+    public List<Long> listSelfAndDescendantIds(Long deptId) {
+        if (deptId == null) {
+            return List.of();
+        }
+        List<SysDept> all = deptMapper.selectList(new LambdaQueryWrapper<>());
+        List<Long> ids = new ArrayList<>();
+        ids.add(deptId);
+        collectDescendantIds(all, deptId, ids);
+        return ids;
+    }
+
+    private void collectDescendantIds(List<SysDept> all, Long parentId, List<Long> ids) {
+        for (SysDept dept : all) {
+            if (parentId.equals(dept.getParentId())) {
+                ids.add(dept.getId());
+                collectDescendantIds(all, dept.getId(), ids);
+            }
+        }
+    }
+
     public void create(DeptSaveRequest req) {
         validateParent(req.getParentId(), null);
         if (deptMapper.selectCount(new LambdaQueryWrapper<SysDept>()

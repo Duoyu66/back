@@ -2,6 +2,7 @@ package com.admin.websocket;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
@@ -40,6 +41,33 @@ public class NoticeWebSocketSessionManager {
         TextMessage message = new TextMessage(json);
         userSessions.values().forEach(sessions ->
                 sessions.forEach(session -> send(session, message)));
+    }
+
+    /** 强退指定会话：推送下线消息并关闭对应 WebSocket */
+    public void kickBySessionId(String sessionId, String json) {
+        if (sessionId == null || sessionId.isBlank()) {
+            return;
+        }
+        TextMessage message = new TextMessage(json);
+        userSessions.values().forEach(sessions -> sessions.forEach(session -> {
+            Object sid = session.getAttributes().get(JwtHandshakeInterceptor.ATTR_SESSION_ID);
+            if (!sessionId.equals(sid)) {
+                return;
+            }
+            send(session, message);
+            close(session, CloseStatus.NORMAL);
+        }));
+    }
+
+    private void close(WebSocketSession session, CloseStatus status) {
+        if (!session.isOpen()) {
+            return;
+        }
+        try {
+            session.close(status);
+        } catch (IOException e) {
+            log.debug("WebSocket close failed: {}", e.getMessage());
+        }
     }
 
     private void send(WebSocketSession session, TextMessage message) {
