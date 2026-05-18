@@ -4,6 +4,16 @@ server:
 spring:
   application:
     name: admin
+  main:
+    banner-mode: off
+  mvc:
+    servlet:
+      # 启动时预加载 DispatcherServlet，避免首条 HTTP 请求在小猫后面打 3 行初始化日志
+      load-on-startup: 1
+  jackson:
+    time-zone: Asia/Shanghai
+    serialization:
+      write-dates-as-timestamps: false
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/admin?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
@@ -27,3 +37,6 @@ jwt:
 logging:
   level:
     com.admin: debug
+    # 首访 Tomcat 时 DispatcherServlet 的 INFO 日志（预加载后一般出现在小猫之前）
+    org.springframework.web.servlet.DispatcherServlet: warn
+    org.apache.catalina.core.ContainerBase: warn

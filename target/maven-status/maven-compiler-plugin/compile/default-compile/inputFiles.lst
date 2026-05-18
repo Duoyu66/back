@@ -1,4 +1,5 @@
 /Users/libingle/Desktop/code/back/src/main/java/com/admin/AdminApplication.java
+/Users/libingle/Desktop/code/back/src/main/java/com/admin/StartupCatBanner.java
 /Users/libingle/Desktop/code/back/src/main/java/com/admin/annotation/OperLog.java
 /Users/libingle/Desktop/code/back/src/main/java/com/admin/aspect/OperLogAspect.java
 /Users/libingle/Desktop/code/back/src/main/java/com/admin/common/BusinessException.java
@@ -7,6 +8,7 @@
 /Users/libingle/Desktop/code/back/src/main/java/com/admin/common/R.java
 /Users/libingle/Desktop/code/back/src/main/java/com/admin/config/AsyncConfig.java
 /Users/libingle/Desktop/code/back/src/main/java/com/admin/config/CorsConfig.java
+/Users/libingle/Desktop/code/back/src/main/java/com/admin/config/JacksonConfig.java
 /Users/libingle/Desktop/code/back/src/main/java/com/admin/config/MybatisPlusConfig.java
 /Users/libingle/Desktop/code/back/src/main/java/com/admin/config/SecurityConfig.java
 /Users/libingle/Desktop/code/back/src/main/java/com/admin/config/WebSocketConfig.java

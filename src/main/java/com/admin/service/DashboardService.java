@@ -31,13 +31,20 @@ public class DashboardService {
         vo.setRoleCount(dashboardMapper.countRoles());
         vo.setDeptCount(dashboardMapper.countDepts());
         vo.setPermissionCount(dashboardMapper.countPermissions());
+        vo.setNoticeTotal(dashboardMapper.countNotices());
+        vo.setNoticePublished(dashboardMapper.countNoticesPublished());
+        vo.setOperLogToday(dashboardMapper.countOperLogToday());
+        vo.setLoginLogToday(dashboardMapper.countLoginLogToday());
         vo.setUserTrend(fillUserTrend(dashboardMapper.selectUserTrend()));
-        vo.setUsersByDept(dashboardMapper.selectUsersByDept());
-        vo.setUsersByRole(dashboardMapper.selectUsersByRole());
+        vo.setUsersByDept(emptyToPlaceholder(dashboardMapper.selectUsersByDept(), "暂无部门数据"));
+        vo.setUsersByRole(emptyToPlaceholder(dashboardMapper.selectUsersByRole(), "暂无角色数据"));
         vo.setUserStatus(List.of(
                 new DashboardStatsVO.NameValueVO("启用", userEnabled),
                 new DashboardStatsVO.NameValueVO("停用", userTotal - userEnabled)
         ));
+        vo.setRecentNotices(dashboardMapper.selectRecentNotices());
+        vo.setRecentOperLogs(dashboardMapper.selectRecentOperLogs());
+        vo.setRecentLoginLogs(dashboardMapper.selectRecentLoginLogs());
         return vo;
     }
 
@@ -57,5 +64,13 @@ public class DashboardService {
         List<DashboardStatsVO.NameValueVO> result = new ArrayList<>();
         map.forEach((name, value) -> result.add(new DashboardStatsVO.NameValueVO(name, value)));
         return result;
+    }
+
+    private List<DashboardStatsVO.NameValueVO> emptyToPlaceholder(
+            List<DashboardStatsVO.NameValueVO> list, String placeholder) {
+        if (list == null || list.isEmpty()) {
+            return List.of(new DashboardStatsVO.NameValueVO(placeholder, 0L));
+        }
+        return list;
     }
 }
