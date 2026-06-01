@@ -51,3 +51,4 @@ mvn spring-boot:run
 | GET | /api/permissions/tree | 权限树 |
 
 请求头：`Authorization: Bearer <token>`
+# MG-AdminBack
